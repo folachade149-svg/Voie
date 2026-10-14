@@ -1,4 +1,4 @@
-/* ---------------- State ---------------- */
+﻿/* ---------------- State ---------------- */
 let state = {
   profile: { name:"", age:"", niveau:"" },
   quizIndex: 0,
@@ -702,7 +702,7 @@ function isModuleUnlocked(domKey, idx){
   return !!modulesPassed[`${domKey}_${idx-1}`];
 }
 
-let academieState = { domaine: null, moduleIndex: 0, tab: 'lecons', examAnswers: {}, examSubmitted: false, exoDone: {} };
+let academieState = { domaine: null, moduleIndex: 0, tab: 'lecons', examAnswers: {}, examSubmitted: false, exoDone: {}, lastExamScore: null, examResults: {} };
 
 function setAcademieDomaine(key){
   academieState.domaine = key;
@@ -710,8 +710,8 @@ function setAcademieDomaine(key){
   academieState.tab = 'lecons';
   academieState.examAnswers = {};
   academieState.examSubmitted = false;
-  academieState.exoDone = {};
   academieState.lastExamScore = null;
+  VoieStore.save();
   renderAcademie();
 }
 
@@ -723,7 +723,9 @@ function setAcademieModule(idx){
   academieState.moduleIndex = idx;
   academieState.tab = 'lecons';
   academieState.examAnswers = {};
+  academieState.examSubmitted = false;
   academieState.lastExamScore = null;
+  VoieStore.save();
   renderAcademie();
 }
 
@@ -732,169 +734,7 @@ function setAcademieTab(tab){
   renderAcademie();
 }
 
-function renderAcademie(){
-  const select = document.getElementById('academie-select');
-  select.innerHTML = Object.entries(SECTORS).map(([key,s]) => `<option value="${key}">${s.name}</option>`).join('');
-  if(!academieState.domaine){
-    academieState.domaine = state.sectorChosen || (state.topSectors[0] && state.topSectors[0].key) || 'technologie';
-  }
-  select.value = academieState.domaine;
-
-  const domKey = academieState.domaine;
-  const body = document.getElementById('academie-body');
-
-  const modulesHtml = `
-    <div class="module-track">
-      ${MODULE_TITRES.map((_, idx) => {
-        const unlocked = isModuleUnlocked(domKey, idx);
-        const passed = !!modulesPassed[`${domKey}_${idx}`];
-        const active = academieState.moduleIndex === idx;
-        const mod = getModule(domKey, idx);
-        return `
-          <button class="module-card ${active?'active':''} ${!unlocked?'locked':''}" onclick="setAcademieModule(${idx})">
-            <span class="module-status">${passed ? ICONS.check : (unlocked ? ICONS.dot : ICONS.close)}</span>
-            <span class="module-title">${mod.titre}</span>
-            <span class="module-duree">${mod.duree}</span>
-          </button>`;
-      }).join('')}
-    </div>
-    <p class="pending-note" style="margin:-4px 0 20px;">Parcours complet estimé : 4 à 6 mois à raison de quelques leçons par semaine, comme un vrai cursus — le Module 2 se débloque après avoir réussi l'examen du Module 1 (70%).</p>
-  `;
-
-  const cours = getModule(domKey, academieState.moduleIndex);
-
-  // Module sans contenu détaillé encore rédigé (2 ou 3) : on montre le programme prévu, pas de fausses leçons.
-  if(!cours.lecons){
-    body.innerHTML = modulesHtml + `
-      <div class="panel">
-        <span class="eyebrow">${esc(cours.titre)} — ${esc(cours.duree)}</span>
-        <h3 style="font-size:16px; margin:6px 0 16px;">Programme prévu pour ce module</h3>
-        <ul style="margin:0 0 16px; padding-left:18px; color:var(--text-muted); font-size:13px; line-height:1.9;">
-          ${cours.topics.map(t => `<li>${t}</li>`).join('')}
-        </ul>
-        <p class="pending-note">Ce module reprend une structure inspirée de vrais programmes de référence (unités d'enseignement de première année de santé, blocs de certification freeCodeCamp pour la technologie, etc.). Son contenu détaillé — leçons, exercices et examen — reste à rédiger dans une prochaine itération : un module complet représente plusieurs semaines de contenu réel.</p>
-      </div>
-    `;
-    return;
-  }
-
-  const tabsHtml = `
-    <div class="academie-tabs">
-      <button class="${academieState.tab==='lecons'?'active':''}" onclick="setAcademieTab('lecons')">1. Leçons</button>
-      <button class="${academieState.tab==='exercices'?'active':''}" onclick="setAcademieTab('exercices')">2. Exercices</button>
-      <button class="${academieState.tab==='examen'?'active':''}" onclick="setAcademieTab('examen')">3. Examen</button>
-    </div>
-  `;
-
-  let contentHtml = '';
-  if(academieState.tab === 'lecons'){
-    contentHtml = cours.lecons.map((lec, i) => `
-      <div class="panel lesson-panel">
-        <span class="eyebrow">Leçon ${i+1} / ${cours.lecons.length}</span>
-        <h3>${esc(lec.titre)}</h3>
-        ${lec.definition ? `<div class="lesson-definition"><strong>Définition — </strong>${esc(lec.definition)}</div>` : ''}
-        ${lec.contenu.map(p => `<p>${p}</p>`).join('')}
-        ${lec.exemple ? `<div class="lesson-example"><span class="lesson-tag">Exemple concret</span><p>${esc(lec.exemple)}</p></div>` : ''}
-        ${lec.note ? `<div class="lesson-note"><span class="lesson-tag">⚠ Erreur fréquente à éviter</span><p>${esc(lec.note)}</p></div>` : ''}
-        ${lec.pointscles ? `<div class="lesson-keypoints"><span class="lesson-tag">Points clés à retenir</span><ul>${lec.pointscles.map(k => `<li>${k}</li>`).join('')}</ul></div>` : ''}
-      </div>
-    `).join('') + `
-      <button class="btn btn-gold" onclick="setAcademieTab('exercices')">Passer aux exercices →</button>
-    `;
-  } else if(academieState.tab === 'exercices'){
-    contentHtml = (academieState.lastExamScore ? renderExamBanner(domKey) : '') + `
-    <div class="panel">
-      <h3 style="font-size:16px; margin-bottom:4px;">Exercices de pratique</h3>
-      <p style="color:var(--text-muted); font-size:13px; margin-top:0; margin-bottom:20px;">${cours.exercices.length} questions pour t'entraîner${academieState.lastExamScore ? " et renforcer les points à revoir" : " avant de passer l'examen"} — la correction s'affiche immédiatement.</p>
-        ${cours.exercices.map((ex, i) => `
-          <div class="lesson-panel" style="margin-bottom:22px;">
-            <p style="font-size:14px; font-weight:600; margin-bottom:10px;">${i+1}. ${ex.q}</p>
-            <div class="exo-options" id="exo-${domKey}-${i}">
-              ${ex.options.map((opt, oi) => `<button onclick="answerExercice('${domKey}',${i},${oi})">${opt}</button>`).join('')}
-            </div>
-            <div class="exo-feedback" id="exo-fb-${domKey}-${i}"></div>
-          </div>
-        `).join('')}
-        ${academieState.lastExamScore ? '' : `<button class="btn btn-gold" onclick="setAcademieTab('examen')">Passer à l'examen →</button>`}
-      </div>
-    `;
-  } else {
-    contentHtml = `
-      <div class="panel">
-        <h3 style="font-size:16px; margin-bottom:4px;">Examen final — ${cours.titre}</h3>
-        <p style="color:var(--text-muted); font-size:13px; margin-top:0; margin-bottom:20px;">${cours.examen.length} questions, dont des cas pratiques. Seuil de réussite : 70%.</p>
-        ${cours.examen.map((q, i) => `
-          <div class="exam-question">
-            <p>${i+1}. ${q.q}</p>
-            <div class="exo-options" id="exam-${i}">
-              ${q.options.map((opt, oi) => `<button onclick="selectExamAnswer(${i},${oi})" id="exam-${i}-${oi}">${opt}</button>`).join('')}
-            </div>
-          </div>
-        `).join('')}
-        <button class="btn btn-gold" onclick="submitExam('${domKey}')">Valider l'examen</button>
-      </div>
-    `;
-  }
-
-  body.innerHTML = modulesHtml + tabsHtml + contentHtml;
-}
-
-function answerExercice(domKey, i, optionIndex){
-  const ex = getModule(domKey, academieState.moduleIndex).exercices[i];
-  const wrap = document.getElementById(`exo-${domKey}-${i}`);
-  [...wrap.children].forEach((btn, bi) => {
-    btn.classList.remove('correct','incorrect');
-    if(bi === ex.correct) btn.classList.add('correct');
-    else if(bi === optionIndex) btn.classList.add('incorrect');
-  });
-  document.getElementById(`exo-fb-${domKey}-${i}`).textContent =
-    (optionIndex === ex.correct ? "Exact — " : "Pas tout à fait — ") + ex.explication;
-}
-
-function selectExamAnswer(qIndex, optionIndex){
-  academieState.examAnswers[qIndex] = optionIndex;
-  const wrap = document.getElementById(`exam-${qIndex}`);
-  [...wrap.children].forEach((btn, i) => {
-    btn.style.borderColor = (i === optionIndex) ? 'var(--gold)' : 'var(--border)';
-  });
-}
-
-function submitExam(domKey){
-  const cours = getModule(domKey, academieState.moduleIndex);
-  if(Object.keys(academieState.examAnswers).length < cours.examen.length){
-    toast("Réponds à toutes les questions avant de valider.");
-    return;
-  }
-  const score = cours.examen.reduce((acc, q, i) => acc + (academieState.examAnswers[i] === q.correct ? 1 : 0), 0);
-  academieState.lastExamScore = { score, total: cours.examen.length };
-  if(score / cours.examen.length >= 0.7){
-    state.examCompleted = true;
-    modulesPassed[`${domKey}_${academieState.moduleIndex}`] = true;
-  }
-  academieState.tab = 'exercices';
-  renderAcademie();
-  renderPath();
-}
-
-function renderExamBanner(domKey){
-  const { score, total } = academieState.lastExamScore;
-  const ratio = score / total;
-  let mention = "Non admis(e) — ces exercices vont t'aider à consolider les bases avant de retenter l'examen.";
-  if(ratio >= 0.9) mention = "Admis(e) — mention très bien. Le module suivant est débloqué.";
-  else if(ratio >= 0.8) mention = "Admis(e) — mention bien. Le module suivant est débloqué.";
-  else if(ratio >= 0.7) mention = "Admis(e) — mention assez bien. Le module suivant est débloqué.";
-  return `
-    <div class="panel exam-banner">
-      <div class="score" style="font-size:28px;">${score}/${total}</div>
-      <p style="color:var(--gold); font-weight:600; margin:8px 0 4px; font-size:14px;">${mention}</p>
-      <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="academieState.examAnswers={}; academieState.lastExamScore=null; setAcademieTab('examen');">Repasser l'examen</button>
-    </div>
-  `;
-}
-
-document.getElementById('academie-select').addEventListener('change', e => setAcademieDomaine(e.target.value));
-
-
+/* ---------------- Dashboard ---------------- */
 /* ---------------- Dashboard ---------------- */
 function saveProfile(){
   state.profile.name = document.getElementById('pf-name').value.trim();

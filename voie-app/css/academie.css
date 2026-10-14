@@ -1,0 +1,251 @@
+/* ============================================================================================
+   ACADÉMIE — mise en page type plateforme de cours (W3Schools / Cisco NetAcad / freeCodeCamp)
+   Trois zones : progression du domaine, sommaire latéral, contenu principal.
+   Chargé après style.css dans index.html.
+   ============================================================================================ */
+
+.ac-shell{ display:grid; grid-template-columns:288px 1fr; gap:0; align-items:start; }
+
+/* ---------- Sommaire latéral ---------- */
+.ac-side{
+  position:sticky; top:80px; max-height:calc(100vh - 110px); overflow-y:auto;
+  border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-panel);
+  padding:14px; margin-right:16px;
+}
+.ac-side::-webkit-scrollbar{ width:8px; }
+.ac-side::-webkit-scrollbar-thumb{ background:var(--bg-panel-2); border-radius:4px; }
+.ac-side-title{
+  font-family:var(--font-display); font-size:15px; color:var(--text);
+  margin:0 0 2px; display:flex; align-items:center; gap:8px;
+}
+.ac-side-title svg{ width:18px; height:18px; color:var(--gold); flex-shrink:0; }
+.ac-side-sub{ font-family:var(--font-mono); font-size:11px; color:var(--text-faint); margin:0 0 12px; }
+
+/* Progression du domaine */
+.ac-progress{ margin-bottom:16px; }
+.ac-progress-head{
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:11px; color:var(--text-muted); margin-bottom:6px;
+}
+.ac-progress-head b{ color:var(--gold); font-family:var(--font-mono); font-size:12px; }
+.ac-progress-bar{ height:6px; background:var(--bg-panel-2); border-radius:3px; overflow:hidden; }
+.ac-progress-bar i{
+  display:block; height:100%; width:0; border-radius:3px;
+  background:linear-gradient(90deg, var(--green), var(--gold)); transition:width .4s ease;
+}
+
+/* Groupe de modules dans le sommaire */
+.ac-group{ margin-bottom:14px; }
+.ac-group-head{
+  display:flex; align-items:center; gap:7px; padding:6px 4px; border-radius:7px;
+  font-size:12px; font-weight:600; color:var(--text);
+}
+.ac-group-head .g-status{ display:inline-flex; width:16px; height:16px; flex-shrink:0; }
+.ac-group-head .g-status svg{ width:14px; height:14px; }
+.ac-group-head.locked{ color:var(--text-faint); }
+.ac-group-head .g-duree{
+  margin-left:auto; font-family:var(--font-mono); font-size:10px; color:var(--text-faint); font-weight:400;
+}
+.g-passed{ color:var(--green); } .g-current{ color:var(--gold); } .g-locked{ color:var(--text-faint); }
+
+.ac-items{ list-style:none; margin:2px 0 0; padding:0 0 0 8px; border-left:1px solid var(--border); }
+.ac-item{
+  display:flex; align-items:center; gap:8px; width:100%; text-align:left;
+  padding:6px 9px; margin:2px 0 2px 4px; border:0; background:transparent;
+  color:var(--text-muted); font-size:12.5px; border-radius:7px; cursor:pointer;
+  transition:background .12s ease, color .12s ease; font-family:var(--font-body);
+}
+.ac-item:hover:not(.locked){ background:var(--bg-panel-2); color:var(--text); }
+.ac-item .i-bullet{
+  width:16px; height:16px; border-radius:50%; flex-shrink:0; display:inline-flex;
+  align-items:center; justify-content:center; font-size:9px;
+  border:1.5px solid var(--text-faint); color:var(--text-faint);
+}
+.ac-item .i-bullet svg{ width:10px; height:10px; }
+.ac-item.done .i-bullet{ border-color:var(--green); background:var(--green); color:#06231c; }
+.ac-item.active{ background:var(--gold-dim); color:var(--gold); font-weight:600; }
+.ac-item.active .i-bullet{ border-color:var(--gold); color:var(--gold); }
+.ac-item.locked{ opacity:.45; cursor:not-allowed; }
+.ac-item .i-kind{
+  margin-left:auto; font-family:var(--font-mono); font-size:9px; color:var(--text-faint);
+  text-transform:uppercase; letter-spacing:.03em;
+}
+.ac-item.type-examen .i-kind{ color:var(--coral); }
+.ac-item.type-exercices .i-kind{ color:var(--green); }
+
+
+/* ---------- Colonne contenu ---------- */
+.ac-main{ min-width:0; }
+.ac-content{
+  background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius);
+  padding:28px 32px; margin-bottom:16px;
+}
+.ac-crumb{
+  display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+  font-family:var(--font-mono); font-size:11px; color:var(--text-faint); margin-bottom:14px;
+}
+.ac-crumb b{ color:var(--text-muted); font-weight:500; }
+.ac-crumb .sep{ opacity:.5; }
+
+.ac-lesson h2{ font-size:24px; line-height:1.25; margin:0 0 6px; }
+.ac-lesson .ac-lede{ color:var(--text-muted); font-size:13px; margin:0 0 22px; }
+.ac-body p{ color:var(--text-muted); font-size:14.5px; line-height:1.75; margin:0 0 14px; }
+
+/* Barre de navigation bas de leçon */
+.ac-pager{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-panel); padding:12px 16px;
+}
+.ac-pager .p-btn{
+  display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:9px;
+  border:1px solid var(--border); background:var(--bg-panel-2); color:var(--text-muted);
+  font-size:12.5px; cursor:pointer; font-family:var(--font-body); transition:border-color .12s ease, color .12s ease;
+}
+.ac-pager .p-btn:hover:not(:disabled){ border-color:var(--gold); color:var(--gold); }
+.ac-pager .p-btn:disabled{ opacity:.35; cursor:not-allowed; }
+.ac-pager .p-btn svg{ width:14px; height:14px; }
+.ac-pager .p-btn.next{ margin-left:auto; border-color:var(--gold-dim); color:var(--gold); }
+.ac-pager .p-mid{ font-family:var(--font-mono); font-size:11px; color:var(--text-faint); }
+
+/* ---------- Blocs pédagogiques ---------- */
+.ac-def{
+  border-left:3px solid var(--gold); background:var(--gold-dim);
+  padding:12px 16px; border-radius:0 9px 9px 0; margin:0 0 20px;
+  font-size:14px; color:var(--text); line-height:1.6;
+}
+.ac-def strong{ color:var(--gold); font-family:var(--font-mono); font-size:11px; letter-spacing:.03em; }
+.ac-callout{
+  border-radius:10px; padding:13px 16px; margin:0 0 16px; border:1px solid var(--border);
+}
+.ac-callout .c-tag{
+  display:inline-block; font-family:var(--font-mono); font-size:10px; letter-spacing:.04em;
+  text-transform:uppercase; margin-bottom:6px;
+}
+.ac-callout p{ margin:0; font-size:13.5px; line-height:1.65; }
+.ac-callout.example{ background:rgba(78,156,134,0.07); border-color:var(--green-dim); }
+.ac-callout.example .c-tag{ color:var(--green); }
+.ac-callout.warn{ background:rgba(198,81,70,0.06); border-color:rgba(198,81,70,0.22); }
+
+/* ---------- Exercices (style freeCodeCamp) ---------- */
+.ac-exo{
+  background:var(--bg-panel-2); border:1px solid var(--border); border-radius:11px;
+  padding:18px 20px; margin-bottom:14px;
+}
+.ac-exo-head{
+  display:flex; align-items:center; gap:9px; margin-bottom:12px;
+  font-family:var(--font-mono); font-size:11px; color:var(--text-faint);
+}
+.ac-exo-num{
+  width:20px; height:20px; border-radius:5px; background:var(--gold-dim); color:var(--gold);
+  display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:600;
+}
+.ac-exo-q{ font-size:14.5px; color:var(--text); line-height:1.55; margin:0 0 14px; font-weight:500; }
+.ac-opts{ display:flex; flex-direction:column; gap:8px; }
+.ac-opt{
+  display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left;
+  padding:11px 14px; border:1px solid var(--border); border-radius:9px;
+  background:var(--bg-panel); color:var(--text-muted); font-size:13.5px; line-height:1.5;
+  cursor:pointer; font-family:var(--font-body); transition:border-color .12s ease, background .12s ease;
+}
+.ac-opt:hover:not(:disabled){ border-color:var(--gold); color:var(--text); }
+.ac-opt .o-key{
+  width:19px; height:19px; border-radius:50%; border:1.5px solid currentColor; flex-shrink:0;
+  display:inline-flex; align-items:center; justify-content:center; font-size:10px; margin-top:1px; opacity:.7;
+}
+.ac-opt:disabled{ cursor:default; }
+.ac-opt.correct{ border-color:var(--green); background:var(--green-dim); color:var(--green); }
+.ac-opt.incorrect{ border-color:var(--coral); background:rgba(198,81,70,0.13); color:var(--coral); }
+.ac-opt.correct .o-key, .ac-opt.incorrect .o-key{ opacity:1; }
+.ac-fb{
+
+/* Résultat d'examen */
+.ac-result{ text-align:center; padding:34px 24px; }
+.ac-result .r-badge{
+  width:78px; height:78px; margin:0 auto 16px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+}
+.ac-result .r-badge svg{ width:38px; height:38px; }
+.ac-result.pass .r-badge{ background:var(--green-dim); color:var(--green); }
+.ac-result.fail .r-badge{ background:rgba(198,81,70,0.14); color:var(--coral); }
+.ac-result .r-score{
+  font-family:var(--font-display); font-size:46px; color:var(--gold); line-height:1; margin-bottom:6px;
+}
+.ac-result h3{ font-size:19px; margin:0 0 6px; }
+.ac-result .r-msg{ color:var(--text-muted); font-size:14px; max-width:440px; margin:0 auto 20px; }
+.ac-result .r-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.ac-result .r-breakdown{
+  text-align:left; max-width:520px; margin:22px auto 0; padding:16px 18px;
+  background:var(--bg-panel-2); border-radius:10px; border:1px solid var(--border);
+}
+.ac-result .r-breakdown h4{
+  font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.04em;
+  color:var(--text-faint); margin:0 0 10px;
+}
+.ac-result .r-line{ display:flex; gap:9px; font-size:13px; line-height:1.6; margin-bottom:9px; color:var(--text-muted); }
+.ac-result .r-line .m{ flex-shrink:0; font-weight:700; }
+.ac-result .r-line.ok .m{ color:var(--green); }
+.ac-result .r-line.ko .m{ color:var(--coral); }
+
+/* ---------- Module « programme prévu » ---------- */
+.ac-roadmap{ list-style:none; margin:0 0 20px; padding:0; }
+.ac-roadmap li{
+  display:flex; gap:12px; padding:13px 16px; margin-bottom:9px;
+  background:var(--bg-panel-2); border:1px solid var(--border); border-radius:10px;
+  font-size:13.5px; color:var(--text-muted); line-height:1.6;
+}
+.ac-roadmap li .rm-num{
+  font-family:var(--font-mono); font-size:11px; color:var(--gold); flex-shrink:0; padding-top:2px;
+}
+.ac-soon{
+  display:flex; gap:12px; align-items:flex-start; padding:15px 17px; border-radius:10px;
+  background:var(--gold-dim); border:1px solid var(--gold-dim);
+}
+.ac-soon svg{ width:19px; height:19px; color:var(--gold); flex-shrink:0; margin-top:1px; }
+.ac-soon p{ margin:0; font-size:13px; color:var(--text-muted); line-height:1.65; }
+
+/* ---------- Responsive ---------- */
+@media (max-width:900px){
+  .ac-shell{ grid-template-columns:1fr; }
+  .ac-side{ position:static; max-height:none; margin:0 0 16px; }
+  .ac-content{ padding:22px 20px; }
+  .ac-pager{ flex-direction:column; align-items:stretch; }
+  .ac-pager .p-btn.next{ margin-left:0; }
+  .ac-pager .p-mid{ text-align:center; order:3; }
+}
+
+  margin-top:11px; padding:10px 13px; border-radius:8px; font-size:13px; line-height:1.6;
+  background:var(--bg-panel); border:1px solid var(--border); color:var(--text-muted);
+  display:none;
+}
+.ac-fb.show{ display:block; }
+.ac-fb.ok{ border-color:var(--green-dim); }
+.ac-fb.ok b{ color:var(--green); }
+.ac-fb.ko{ border-color:rgba(198,81,70,0.3); }
+.ac-fb.ko b{ color:var(--coral); }
+
+/* ---------- Examen ---------- */
+.ac-exam-meta{
+  display:flex; gap:20px; flex-wrap:wrap; padding:14px 18px; margin-bottom:20px;
+  background:var(--bg-panel-2); border:1px solid var(--border); border-radius:11px;
+}
+.ac-exam-meta div{ font-size:12px; color:var(--text-muted); }
+.ac-exam-meta b{ display:block; font-family:var(--font-mono); font-size:16px; color:var(--text); margin-top:3px; }
+.ac-exam-meta b.gold{ color:var(--gold); }
+.ac-exam-q{ margin-bottom:22px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+.ac-exam-q:last-of-type{ border-bottom:0; }
+.ac-exam-q .q-num{
+  font-family:var(--font-mono); font-size:11px; color:var(--gold); margin-bottom:7px; display:block;
+}
+.ac-exam-q .q-text{ font-size:14.5px; color:var(--text); line-height:1.6; margin:0 0 13px; font-weight:500; }
+.ac-exam-q .ac-opt.sel{ border-color:var(--gold); background:var(--gold-dim); color:var(--gold); }
+.ac-submit-row{ margin-top:22px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.ac-submit-row .hint{ font-size:12px; color:var(--text-muted); }
+
+.ac-callout.warn .c-tag{ color:var(--coral); }
+.ac-keys{ margin:22px 0 0; padding:16px 18px; background:var(--bg-panel-2); border-radius:10px; }
+.ac-keys h4{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--gold); margin:0 0 10px;
+}
+.ac-keys ul{ margin:0; padding-left:18px; }
+.ac-keys li{ font-size:13.5px; color:var(--text-muted); line-height:1.7; margin-bottom:5px; }

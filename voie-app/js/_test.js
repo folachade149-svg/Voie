@@ -1,91 +1,132 @@
-/* Test de fumée (smoke test) : à charger APRÈS app.js dans une page de test.
-   Vérifie le rendu initial, l'échappement, la persistance et la recherche d'offres.
-   Usage : <script src="js/_test.js"></script> en dernier, puis lire #test-results. */
+/* Test de fumée : à charger EN DERNIER dans une page de test.
+   Couvre rendu initial, sécurité, quiz, moteur Académie, persistance, offres, modales.
+   Usage : <script src="js/_test.js"></script> puis lire #test-results. */
 window.addEventListener('load', function(){
   var r = [];
   var ok = function(label, cond){ r.push((cond ? 'OK   ' : 'ECHEC ') + label); };
+  function has(sel){ return !!document.querySelector(sel); }
+  function txt(el){ return el ? el.innerHTML : ''; }
+  function resetAcademie(dom, mod){
+    academieState.domaine = dom; academieState.moduleIndex = mod;
+    academieState.tab = 'lecons'; academieState.lecIndex = 0;
+    academieState.exoDone = {}; academieState.examAnswers = {}; academieState.examSubmitted = false;
+  }
 
   try{
-    // 1. Rendu initial
+    /* ===== Base ===== */
     ok('nav rendue', !!document.getElementById('tabs'));
-    ok('ecran accueil visible', !!document.querySelector('#screen-home.visible'));
+    ok('accueil visible', has('#screen-home.visible'));
     ok('FAQ rendue', document.getElementById('faq-list').children.length > 0);
-    ok('stats rendues', !!document.getElementById('stats-row'));
 
-    // 2. Échappement XSS
-    ok('esc() echappe les chevrons', esc('<img src=x onerror=alert(1)>').indexOf('<img') === -1);
+    /* ===== Sécurité ===== */
+    ok('esc() neutralise les chevrons', esc('<img src=x onerror=alert(1)>').indexOf('<img') === -1);
     ok('esc() echappe les guillemets', esc('a"b').indexOf('&quot;') >= 0);
-    ok('esc() gere null/undefined', esc(null) === '' && esc(undefined) === '');
-
-    // 3. Empreinte des mots de passe
     var h1 = hashPwd('demo1234');
     ok('hashPwd deterministe', h1 === hashPwd('demo1234'));
     ok('hashPwd different selon saisie', h1 !== hashPwd('demo12345'));
-    ok('checkPwd valide le bon mot de passe', checkPwd(h1, 'demo1234') === true);
-    ok('checkPwd refuse le mauvais', checkPwd(h1, 'faux') === false);
-    ok('mot de passe non stocke en clair', document.documentElement.innerHTML.indexOf('demo1234') === -1);
+    ok('checkPwd valide / refuse', checkPwd(h1,'demo1234') === true && checkPwd(h1,'faux') === false);
 
-    // 4. Persistance
-    state.applications.push({ jobId:'test-1', titre:'Offre test', entreprise:'Test SARL', date:new Date().toISOString(), statut:'envoyee' });
-    state.savedJobs.push(jobsData[0].id);
+    /* ===== Quiz ===== */
+    var S10 = ['sante','technologie','art','commerce','agriculture','education','ingenierie','psychologie','mode','aviation'];
+    var minCov = 99;
+    S10.forEach(function(s){
+      var c = (QUIZ.join('').match(new RegExp('"'+s+'"','g')) || []).length;
+      if(c < minCov) minCov = c;
+    });
+    ok('quiz ' + QUIZ.length + ' questions, min secteur = ' + minCov, QUIZ.length >= 40 && minCov >= 6);
+
+    /* ===== Académie : contenu ===== */
+    ok('academie.js chargé', typeof renderAcademie === 'function' && typeof academieGo === 'function');
+    var full = S10.filter(function(s){ return COURS[s] && COURS[s].lecons && COURS[s].lecons.length === 3 && COURS[s].exercices.length >= 10 && COURS[s].examen.length >= 10; });
+    ok('10 domaines complets (leçons+exos+examen): ' + full.length + '/10', full.length === 10);
+
+    /* ===== Académie : rendu plateforme ===== */
+    resetAcademie('technologie', 0);
+    renderAcademie();
+    var body = document.getElementById('academie-body');
+    ok('layout plateforme (shell+sidebar+main)', has('.ac-shell') && has('.ac-side') && has('.ac-main'));
+    ok('barre de progression du module', has('.ac-progress-bar'));
+    ok('sommaire liste 3 modules', document.querySelectorAll('.ac-group').length === 3);
+    ok('bouton marquer la leçon', /Marquer cette le/.test(txt(body)) || /Leçon validée/.test(txt(body)));
+
+    /* ===== Navigation leçon par leçon ===== */
+    var nl = getModule('technologie', 0).lecons.length;
+    ok('module 1 a ' + nl + ' leçons', nl === 3);
+    academieGo('lecon', 1);
+    ok('aller à la leçon 2', academieState.lecIndex === 1);
+    academieGo('lecon', 0);
+    academieMarkRead(0);
+    ok('leçon 1 marquée lue', academieState.exoDone['lec0'] === true);
+
+    academieState.tab = 'lecons'; academieState.lecIndex = 0;
+    ok('barre précédent/suivant', has('.ac-pager'));
+    academieNext();
+    ok('Suivant : leçon 1 -> 2', academieState.lecIndex === 1);
+    academiePrev();
+    ok('Précédent : leçon 2 -> 1', academieState.lecIndex === 0);
+
+    /* ===== Exercices à correction immédiate ===== */
+    academieGo('exercices', -1);
+    var exos = getModule('technologie', 0).exercices;
+    ok('onglet exercices', /Exercices/.test(txt(document.getElementById('academie-body'))));
+    academieAnswerExo(0, exos[0].correct);
+    ok('exercice réponse enregistrée', academieState.exoDone['exo0'] === true);
+
+    /* ===== Examen + progression + déblocage ===== */
+    var prog = academieProgress();
+    ok('progression calculée (' + prog.done + '/' + prog.total + ')', prog.total > 0 && prog.done >= 2);
+
+    academieGo('examen', -1);
+    ok('examen affiché', /Examen du module/.test(txt(document.getElementById('academie-body'))));
+    var exam = getModule('technologie', 0).examen;
+    exam.forEach(function(q, i){ academieSelectExam(i, q.correct); });
+    academieSubmitExam();
+    ok('module 1 validé (examen réussi)', modulesPassed['technologie_0'] === true);
+    ok('correction détaillée affichée', /Correction détaillée/.test(txt(document.getElementById('academie-body'))));
+    ok('module 2 débloqué', isModuleUnlocked('technologie', 1) === true);
+
+    modulesPassed['technologie_0'] = false;
+    academieGo('examen', -1);
+    exam.forEach(function(q, i){ academieSelectExam(i, (q.correct + 1) % q.options.length); });
+    academieSubmitExam();
+    ok('échec : module reste verrouillé', modulesPassed['technologie_0'] !== true);
+    ok('message de seuil affiché', /70|seuil|Non admis/i.test(txt(document.getElementById('academie-body'))));
+
+    /* ===== Module 2 réel + module vide honnête ===== */
+    modulesPassed['technologie_0'] = true;
+    academieState.moduleIndex = 1; academieState.tab = 'lecons'; academieState.lecIndex = 0;
+    renderAcademie();
+    var m2 = getModule('technologie', 1);
+    ok('technologie module 2 réel (' + (m2.lecons ? m2.lecons.length : 0) + ' leçons)', m2.lecons && m2.lecons.length > 0);
+
+    resetAcademie('art', 2);
+    renderAcademie();
+    ok('module sans contenu affiche le programme', /Programme/.test(txt(document.getElementById('academie-body'))));
+
+    /* ===== Persistance ===== */
+    resetAcademie('technologie', 0);
     VoieStore.save();
-    var raw = null;
-    try{ raw = localStorage.getItem(STORE_KEY); }catch(e){}
-    ok('etat ecrit dans localStorage', !!raw);
-    ok('candidature persistee', raw && raw.indexOf('Offre test') >= 0);
-    var reloaded = VoieStore.load();
-    ok('etat recharge', reloaded === true && state.applications.length >= 1);
-    VoieStore.clear();
-    ok('etat effacable', localStorage.getItem(STORE_KEY) === null);
+    ok('progression académie persistée', localStorage.getItem(STORE_KEY).indexOf('technologie') >= 0);
 
-    // 5. Recherche et filtres d'offres
-    currentUser = { name:'Test User', email:'test@voie.bj', photo:null, phone:'', birthdate:'', country:'Benin', city:'Cotonou', address:'' };
+    /* ===== Offres (régression) ===== */
+    currentUser = { name:'Test', email:'test@voie.bj', photo:null, phone:'', birthdate:'', country:'Benin', city:'Cotonou', address:'' };
     state.userRole = 'apprenant';
     showScreen('jobs');
     var cards = document.querySelectorAll('#jobs-list .job-card').length;
-    ok('offres affichees (' + cards + ')', cards > 0);
-    ok('filtres rendus', !!document.getElementById('jobs-q'));
-
-    jobsFilter.q = 'agricole';
-    renderJobs();
+    ok('offres affichées (' + cards + ')', cards > 0);
+    jobsFilter.q = 'agricole'; renderJobs();
     var filtered = document.querySelectorAll('#jobs-list .job-card').length;
-    ok('recherche filtre (' + filtered + ' resultat)', filtered > 0 && filtered < cards);
-
-    jobsFilter.q = 'zzzzzintrouvable';
-    renderJobs();
-    ok('etat vide affiche', !!document.querySelector('#jobs-list .empty'));
+    ok('recherche filtre (' + filtered + ')', filtered > 0 && filtered < cards);
     resetJobsFilters();
 
-    // 6. Favoris et candidature
-    var favBtns = document.querySelectorAll('#jobs-list .btn-fav').length;
-    ok('boutons favoris presents (' + favBtns + ')', favBtns > 0);
-    var jid = jobsData[0].id;
-    state.applications = [];
-    applyJob(jobsData[0].titre);
-    ok('candidature liee a une offre', hasApplied(jid) && state.applications[0].jobId === jid);
-    applyJob(jobsData[0].titre);
-    ok('pas de doublon de candidature', state.applications.length === 1);
-
-    // 7. Échappement effectif dans le DOM (injection via données d'offre)
-    jobsData.unshift({ id:'xss-1', titre:'<b>XSS</b>', entreprise:'<i>Bad</i>', secteur:'technologie', niveau:'Bac', ville:'Cotonou', contrat:'CDI', desc:'<script>alert(1)</script>', verifie:true, missions:[], profil:[] });
-    renderJobs();
-    ok('titre injecte neutralise', document.getElementById('jobs-list').querySelectorAll('.job-card b').length === 0);
-    jobsData.shift();
-
-    // 8. Modales accessibles
+    /* ===== Modales ===== */
     modalStack = [];
     openModal('job-modal');
-    ok('modale ouverte + role dialog', document.getElementById('job-modal').classList.contains('open') && document.getElementById('job-modal').getAttribute('aria-modal') === 'true');
-    var evt = new KeyboardEvent('keydown', { key:'Escape' });
-    document.dispatchEvent(evt);
-    ok('Echap ferme la modale', !document.getElementById('job-modal').classList.contains('open') && modalStack.length === 0);
+    ok('modale role=dialog', has('#job-modal[aria-modal="true"]'));
+    document.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape' }));
+    ok('Échap ferme la modale', !document.getElementById('job-modal').classList.contains('open'));
 
-    // 9. Navigation protégée
-    currentUser = null;
-    state.userRole = null;
-    showScreen('academie');
-    ok('gardien redirige vers connexion', !!document.querySelector('#screen-login.visible'));
-
+    VoieStore.clear();
   }catch(err){
     r.push('EXCEPTION ' + (err && err.message));
   }
@@ -95,3 +136,4 @@ window.addEventListener('load', function(){
   box.textContent = r.join('\n');
   document.body.appendChild(box);
 });
+

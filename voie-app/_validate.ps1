@@ -1,4 +1,4 @@
-# Validation statique du projet Voie.
+﻿# Validation statique du projet Voie.
 # Controles : ordre des scripts, identifiants, fonctions appelees, doublons,
 # echappement des valeurs dynamiques, mot de passe de demonstration.
 # Usage : powershell -NoProfile -ExecutionPolicy Bypass -File _validate.ps1
@@ -6,7 +6,7 @@ $ErrorActionPreference = 'Continue'
 $root = $PSScriptRoot
 $html = [System.IO.File]::ReadAllText((Join-Path $root 'index.html'), [System.Text.Encoding]::UTF8)
 $js = ''
-foreach($f in 'storage.js','data.js','app.js'){
+foreach($f in 'storage.js','data.js','app.js','academie.js'){
   $js += [System.IO.File]::ReadAllText((Join-Path $root "js\$f"), [System.Text.Encoding]::UTF8) + "`n"
 }
 $problems = @()

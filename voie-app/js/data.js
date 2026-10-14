@@ -838,6 +838,37 @@ const QUIZ = [
     { label:"Être responsable de la sécurité de dizaines de personnes", tags:["aviation"], meta:["rigueur"] },
     { label:"Voir grandir une activité que tu as créée", tags:["commerce"], meta:["creativite"] },
     { label:"Voir progresser quelqu'un grâce à toi", tags:["education"], meta:["relationnel"] }
+  ]},
+  // ---- Questions complémentaires : équilibrent la couverture des domaines Mode, Aviation et Éducation ----
+  { type:"scale", text:"Soigner ton apparence et ton style comme une forme d'expression personnelle.", tags:["mode"], meta:["creativite"] },
+  { type:"scale", text:"Suivre une procédure stricte, étape par étape, sans jamais sauter une case — même répétée mille fois.", tags:["aviation"], meta:["rigueur"] },
+  { type:"scale", text:"Expliquer quelque chose de compliqué à quelqu'un jusqu'à ce qu'il comprenne vraiment.", tags:["education"], meta:["relationnel"] },
+  { type:"scale", text:"Soigner ta posture, ton style ou ton image pour capter le regard — photo, tenue, présentation.", tags:["mode"], meta:["creativite"] },
+  { type:"scale", text:"Rester concentré(e) et précis(e) pendant plusieurs heures d'affilée, sans relâcher l'attention.", tags:["aviation"], meta:["rigueur"] },
+  { type:"scale", text:"Prendre le temps de répéter avec un élève jusqu'à ce qu'il maîtrise une notion.", tags:["education"], meta:["relationnel"] },
+  { type:"scale", text:"Coordonner un défilé, une séance photo ou une mise en scène, du choix des tenues au rendu final.", tags:["mode"], meta:["creativite"] },
+  { type:"scale", text:"Réagir avec calme et méthode face à une situation imprévue et potentiellement dangereuse.", tags:["aviation"], meta:["rigueur"] },
+  { type:"scale", text:"Inventer une activité, un jeu ou un support pour rendre une notion concrète et ludique.", tags:["education"], meta:["creativite"] },
+  { type:"scale", text:"Adapter ton style vestimentaire selon les contextes, comme un outil de communication à part entière.", tags:["mode"], meta:["creativite"] },
+  { type:"scale", text:"Anticiper les risques avant qu'un problème ne survienne, pour ne jamais avoir à improviser.", tags:["aviation"], meta:["logique"] },
+  { type:"scale", text:"Évaluer honnêtement le niveau de chacun et ajuster ton explication en conséquence.", tags:["education"], meta:["relationnel"] },
+  { type:"choice", text:"Tu dois préparer une présentation pour un public. Ton rôle naturel serait plutôt de...", options:[
+    { label:"Soigner le rendu visuel, la tenue et l'image globale", tags:["mode"], meta:["creativite"] },
+    { label:"Vérifier la logistique et le plan de sécurité de l'événement", tags:["aviation"], meta:["rigueur"] },
+    { label:"Construire les explications et les exemples pour que le public comprenne", tags:["education"], meta:["relationnel"] },
+    { label:"Préparer les supports techniques et la mise en page", tags:["technologie"], meta:["pratique"] }
+  ]},
+  { type:"choice", text:"Face à un travail répétitif mais qui demande de la précision, tu réagis plutôt...", options:[
+    { label:"En suivant scrupuleusement la checklist, sans rien improviser", tags:["aviation"], meta:["rigueur"] },
+    { label:"En cherchant un moyen créatif de rendre la tâche plus vivante", tags:["mode"], meta:["creativite"] },
+    { label:"En expliquant pourquoi la procédure existe, pour motiver l'équipe", tags:["education"], meta:["relationnel"] },
+    { label:"En automatisant ou en optimisant le processus", tags:["technologie"], meta:["logique"] }
+  ]},
+  { type:"choice", text:"Dans un projet, ce qui te frustre le plus, c'est...", options:[
+    { label:"Un rendu visuel bâclé ou une image incohérente", tags:["mode"], meta:["creativite"] },
+    { label:"Une procédure de sécurité mal respectée par l'équipe", tags:["aviation"], meta:["rigueur"] },
+    { label:"Voir un collègue ne pas comprendre et rester bloqué", tags:["education"], meta:["relationnel"] },
+    { label:"Une solution technique qui ne tient pas la route", tags:["ingenierie"], meta:["logique"] }
   ]}
 ];
 const CHOICE_WEIGHT = 3;
