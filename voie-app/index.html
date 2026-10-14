@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voie — Trouve ta voie, construis ta carrière</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="splash-screen">
+  <svg viewBox="0 0 24 24" fill="none">
+    <path class="splash-path" d="M4 20 C4 12, 10 12, 12 4 C14 12, 20 12, 20 20" stroke="#E7B75F" stroke-width="1.6" stroke-linecap="round"/>
+  </svg>
+  <div class="splash-word"><span>V</span><span>o</span><span>i</span><span>e</span></div>
+</div>
+
+<header class="nav">
+  <div class="logo" onclick="goHome()" style="cursor:pointer;">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 20 C4 12, 10 12, 12 4 C14 12, 20 12, 20 20" stroke="#E7B75F" stroke-width="1.6" stroke-linecap="round"/></svg>
+    Voie
+  </div>
+  <div class="nav-right">
+    <nav class="tabs" id="tabs"></nav>
+    <div class="header-account" id="header-account"></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- LOGIN -->
+  <section class="screen" id="screen-login">
+    <div class="login-wrap">
+      <div class="panel login-panel">
+        <div class="logo" style="margin-bottom:6px;">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 20 C4 12, 10 12, 12 4 C14 12, 20 12, 20 20" stroke="#E7B75F" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Voie
+        </div>
+        <p style="color:var(--text-muted); font-size:13px; margin:0 0 22px;">Connecte-toi pour accéder à la plateforme.</p>
+
+        <div class="login-toggle">
+          <button id="login-tab-btn" class="active" onclick="setAuthMode('login')">Se connecter</button>
+          <button id="signup-tab-btn" onclick="setAuthMode('signup')">Créer un compte</button>
+        </div>
+
+        <form id="auth-form">
+          <div class="field" id="auth-photo-field" style="display:none; text-align:center;">
+            <label style="display:block; text-align:left;">Photo de profil (optionnel)</label>
+            <div class="photo-picker">
+              <div class="photo-preview" id="auth-photo-preview"></div>
+              <input type="file" id="auth-photo" accept="image/*" style="display:none;">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('auth-photo').click()">Choisir une photo</button>
+            </div>
+          </div>
+          <div class="field" id="auth-role-field" style="display:none;">
+            <label>Je suis...</label>
+            <div class="auth-role-toggle">
+              <button type="button" id="auth-role-apprenant" class="active" onclick="setAuthRoleChoice('apprenant')">
+                <span id="auth-role-icon-apprenant"></span> Étudiant(e) / Apprenant(e)
+              </button>
+              <button type="button" id="auth-role-entreprise" onclick="setAuthRoleChoice('entreprise')">
+                <span id="auth-role-icon-entreprise"></span> Entreprise qui recrute
+              </button>
+            </div>
+          </div>
+          <div class="field" id="auth-name-field" style="display:none;"><label for="auth-name">Nom complet</label><input id="auth-name" placeholder="ex : Aïcha Dossou"></div>
+          <div class="field"><label for="auth-email">Email</label><input id="auth-email" type="email" required placeholder="toi@exemple.com"></div>
+          <div class="field"><label for="auth-password">Mot de passe</label><input id="auth-password" type="password" required placeholder="••••••••"></div>
+
+          <div id="auth-extra-fields" style="display:none;">
+            <div class="grid grid-2">
+              <div class="field"><label for="auth-phone">Téléphone</label><input id="auth-phone" type="tel" placeholder="+229 XX XX XX XX"></div>
+              <div class="field"><label for="auth-birthdate">Date de naissance</label><input id="auth-birthdate" type="date"></div>
+            </div>
+            <div class="grid grid-2">
+              <div class="field">
+                <label for="auth-country">Pays</label>
+                <select id="auth-country">
+                  <option>Bénin</option><option>Togo</option><option>Côte d'Ivoire</option><option>Ghana</option><option>Nigeria</option><option>Niger</option><option>Burkina Faso</option><option>Sénégal</option><option>Autre</option>
+                </select>
+              </div>
+              <div class="field"><label for="auth-city">Ville</label><input id="auth-city" placeholder="ex : Cotonou"></div>
+            </div>
+            <div class="field"><label for="auth-address">Adresse (quartier, rue...)</label><input id="auth-address" placeholder="ex : Quartier Fidjrossè, Cotonou"></div>
+          </div>
+
+          <div id="auth-error" class="auth-error"></div>
+          <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;" id="auth-submit-btn">Se connecter</button>
+        </form>
+        <p class="pending-note">Démonstration : compte test — <strong>demo@voie.bj</strong> / <strong>demo1234</strong>. Cette connexion est simulée côté navigateur à des fins de prototype ; elle ne représente pas un système d'authentification sécurisé réel.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOME -->
+  <section class="screen visible" id="screen-home">
+    <div class="home-hero-grid">
+      <div class="hero">
+        <span class="eyebrow">Orientation · Suivi · Emploi</span>
+        <h1>Trouve ce que tu aimes <span class="accent">avant</span> de choisir ce que tu fais.</h1>
+        <p class="lede">Voie t'aide à explorer les métiers dès le plus jeune âge, suit ton parcours jusqu'à l'âge adulte, et te met en relation avec les entreprises qui recrutent — selon ton niveau, ton âge et tes compétences réelles.</p>
+      </div>
+      <svg class="hero-illustration" viewBox="0 0 300 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="hi-path" d="M20 190 C 70 190, 55 130, 100 118 C 150 105, 130 55, 200 40 C 225 35, 245 32, 270 28"
+          stroke="#E7B75F" stroke-width="2" fill="none" opacity="0.55"/>
+        <circle class="hi-dot" cx="20" cy="190" r="7" fill="#E7B75F"/>
+        <circle class="hi-dot" cx="100" cy="118" r="7" fill="#4E9C86"/>
+        <circle class="hi-dot" cx="200" cy="40" r="7" fill="#E7B75F"/>
+        <circle class="hi-dot" cx="270" cy="28" r="7" fill="#4E9C86"/>
+        <text x="20" y="210">Découverte</text>
+        <text x="72" y="138">Parcours</text>
+        <text x="178" y="60">Académie</text>
+        <text x="238" y="16">Emploi</text>
+      </svg>
+    </div>
+
+    <div class="role-grid">
+      <button class="role-card" onclick="chooseRole('apprenant')">
+        <span class="role-icon" id="role-icon-apprenant"></span>
+        <h3>Je découvre ma voie</h3>
+        <p>Test d'orientation, suivi de parcours, cours et offres d'emploi adaptées à mon profil.</p>
+        <span class="role-cta">Commencer →</span>
+      </button>
+      <button class="role-card" onclick="chooseRole('entreprise')">
+        <span class="role-icon" id="role-icon-entreprise"></span>
+        <h3>Je recrute</h3>
+        <p>Publier des offres d'emploi vérifiées et accéder à des profils qualifiés selon niveau et compétences.</p>
+        <span class="role-cta">Espace entreprise →</span>
+      </button>
+    </div>
+
+    <div class="stats-row" id="stats-row"></div>
+
+    <!-- LE CONSTAT -->
+    <div class="constat-section">
+      <span class="eyebrow">Le constat</span>
+      <h2 style="font-size:24px; max-width:640px;">Beaucoup choisissent un métier par nécessité, rarement par vocation.</h2>
+      <p class="lede" style="max-width:640px;">Faute d'avoir pu explorer sereinement ce qu'ils aiment vraiment faire, ou parce que leur entourage juge certains métiers « pas sérieux », de nombreux jeunes se retrouvent dans des voies qu'ils n'ont pas vraiment choisies.</p>
+      <div class="constat-grid">
+        <div class="panel constat-card">
+          <div class="big-num">10</div>
+          <p>domaines à explorer avant de se fermer des portes trop tôt, du soin à l'ingénierie en passant par la mode.</p>
+        </div>
+        <div class="panel constat-card">
+          <div class="big-num">4-6 mois</div>
+          <p>de parcours de formation réel par domaine dans l'Académie — pas un simple test qu'on oublie en 10 minutes.</p>
+        </div>
+        <div class="panel constat-card">
+          <div class="big-num">70%</div>
+          <p>de seuil de réussite exigé aux examens — un vrai standard, pas une case à cocher.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMENT ÇA MARCHE -->
+    <div class="steps-flow">
+      <span class="eyebrow">Comment ça marche</span>
+      <h2 style="font-size:24px;">Un chemin, pas un test unique.</h2>
+      <div class="steps-row">
+        <div class="step-flow-item">
+          <div class="step-flow-circle" id="sf-icon-1"></div>
+          <h4>1. Découverte</h4>
+          <p>Un test par mises en situation concrètes, pas un questionnaire scolaire de plus.</p>
+        </div>
+        <div class="step-flow-item">
+          <div class="step-flow-circle" id="sf-icon-2"></div>
+          <h4>2. Parcours suivi</h4>
+          <p>Un profil qui évolue avec toi : compétences, étapes franchies, ambitions.</p>
+        </div>
+        <div class="step-flow-item">
+          <div class="step-flow-circle" id="sf-icon-3"></div>
+          <h4>3. Académie</h4>
+          <p>Des cours approfondis, des exercices et un examen exigeant pour valider les bases.</p>
+        </div>
+        <div class="step-flow-item">
+          <div class="step-flow-circle" id="sf-icon-4"></div>
+          <h4>4. Emploi</h4>
+          <p>Des offres vérifiées, proposées selon ton profil réel — pas au hasard.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANORAMA DES DOMAINES -->
+    <div class="domain-showcase">
+      <span class="eyebrow">10 domaines à explorer</span>
+      <h2 style="font-size:24px;">Du soin à l'ingénierie, de l'art à l'aviation.</h2>
+      <div class="domain-grid" id="domain-grid"></div>
+    </div>
+
+    <!-- POURQUOI VOIE -->
+    <div class="compare-section">
+      <span class="eyebrow">Pourquoi Voie</span>
+      <h2 style="font-size:24px;">Différent d'une orientation classique.</h2>
+      <div class="compare-grid">
+        <div class="panel compare-col old">
+          <h3>Orientation classique</h3>
+          <ul class="compare-list">
+            <li><span class="ci">✕</span> Un test générique, sans suivi dans le temps</li>
+            <li><span class="ci">✕</span> Des choix influencés par la pression sociale ou familiale</li>
+            <li><span class="ci">✕</span> Aucun lien direct avec de vraies offres d'emploi</li>
+            <li><span class="ci">✕</span> Peu de place pour explorer plusieurs pistes en profondeur</li>
+          </ul>
+        </div>
+        <div class="panel compare-col new">
+          <h3>Avec Voie</h3>
+          <ul class="compare-list">
+            <li><span class="ci">✓</span> Un profil qui se construit sur plusieurs mois, du test au premier emploi</li>
+            <li><span class="ci">✓</span> Des mises en situation concrètes plutôt que des questions abstraites</li>
+            <li><span class="ci">✓</span> Des offres d'emploi vérifiées, reliées directement au profil</li>
+            <li><span class="ci">✓</span> Dix domaines explorables en profondeur, avec cours et examens réels</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="faq-section">
+      <span class="eyebrow">Questions fréquentes</span>
+      <h2 style="font-size:24px; margin-bottom:6px;">Encore quelques questions ?</h2>
+      <div id="faq-list"></div>
+    </div>
+
+    <div class="final-cta">
+      <h2>Prêt(e) à explorer ta voie ?</h2>
+      <p>Que tu cherches ta voie ou les talents de demain, l'inscription prend moins d'une minute.</p>
+      <div class="hero-actions" style="justify-content:center;">
+        <button class="btn btn-gold" onclick="chooseRole('apprenant')">Je découvre ma voie</button>
+        <button class="btn btn-ghost" onclick="chooseRole('entreprise')">Je recrute</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- HOME APPRENANT (après connexion) -->
+  <section class="screen" id="screen-home-apprenant">
+    <div class="hero">
+      <span class="eyebrow" id="ha-greeting">Bon retour</span>
+      <h1>Continue à construire <span class="accent">ta voie</span>.</h1>
+      <p class="lede">Reprends là où tu t'es arrêté(e) — test de découverte, cours, ou offres correspondant à ton profil.</p>
+    </div>
+
+    <div class="role-grid" style="grid-template-columns:repeat(2,1fr);">
+      <button class="role-card" onclick="showScreen('quiz')">
+        <span class="role-icon" id="ha-icon-quiz"></span>
+        <h3>Test de découverte</h3>
+        <p>Explore les secteurs qui te correspondent à travers des mises en situation concrètes.</p>
+        <span class="role-cta">Continuer →</span>
+      </button>
+      <button class="role-card" onclick="goToParcours()">
+        <span class="role-icon" id="ha-icon-parcours"></span>
+        <h3>Mon parcours</h3>
+        <p>Ton profil, tes compétences observées et les étapes déjà franchies.</p>
+        <span class="role-cta">Voir mon parcours →</span>
+      </button>
+      <button class="role-card" onclick="showScreen('academie')">
+        <span class="role-icon" id="ha-icon-academie"></span>
+        <h3>Académie</h3>
+        <p>Des leçons détaillées, des exercices et un examen pour valider les bases d'un domaine.</p>
+        <span class="role-cta">Apprendre →</span>
+      </button>
+      <button class="role-card" onclick="showScreen('jobs')">
+        <span class="role-icon" id="ha-icon-jobs"></span>
+        <h3>Offres d'emploi</h3>
+        <p>Des offres vérifiées, mises en avant selon la voie que tu as choisie.</p>
+        <span class="role-cta">Voir les offres →</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- HOME ENTREPRISE (après connexion) -->
+  <section class="screen" id="screen-home-entreprise">
+    <div class="hero">
+      <span class="eyebrow" id="he-greeting">Espace entreprise</span>
+      <h1>Trouvez les <span class="accent">talents de demain</span>, dès aujourd'hui.</h1>
+      <p class="lede">Publiez des offres vérifiées et consultez des profils suivis depuis leur test d'orientation jusqu'à leurs compétences réelles.</p>
+    </div>
+
+    <div class="stats-row" id="stats-row-entreprise"></div>
+
+    <div class="role-grid" style="grid-template-columns:repeat(2,1fr);">
+      <button class="role-card" onclick="showScreen('business')">
+        <span class="role-icon" id="he-icon-business"></span>
+        <h3>Publier une offre</h3>
+        <p>Diffusez un poste auprès d'apprenants suivis et engagés dans un secteur précis.</p>
+        <span class="role-cta">Publier →</span>
+      </button>
+      <button class="role-card" onclick="showScreen('candidats')">
+        <span class="role-icon" id="he-icon-candidats"></span>
+        <h3>Profils &amp; parcours</h3>
+        <p>Consultez les compétences, examens validés et étapes de parcours des apprenants.</p>
+        <span class="role-cta">Voir les profils →</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- À PROPOS -->
+  <section class="screen" id="screen-apropos">
+    <div class="hero" style="padding-top:8px;">
+      <span class="eyebrow">Notre mission</span>
+      <h1>Un même chemin, du premier test <span class="accent">au premier emploi</span>.</h1>
+      <p class="lede">Voie est né d'un constat simple : beaucoup de jeunes choisissent un métier par nécessité plutôt que par vocation, faute d'avoir pu explorer sereinement ce qu'ils aiment vraiment faire — et beaucoup d'entreprises peinent à trouver des profils motivés et suivis dans la durée.</p>
+    </div>
+    <div class="grid grid-3" style="margin-top:36px;">
+      <div class="panel">
+        <span class="step-num">01</span>
+        <h3>Un test qui respecte la personne</h3>
+        <p>Pas un questionnaire scolaire de plus : des mises en situation concrètes et des choix à arbitrer, pour révéler de vraies affinités.</p>
+      </div>
+      <div class="panel">
+        <span class="step-num">02</span>
+        <h3>Un suivi qui dure</h3>
+        <p>Le profil évolue avec la personne — de la découverte à l'Académie, jusqu'aux premières candidatures.</p>
+      </div>
+      <div class="panel">
+        <span class="step-num">03</span>
+        <h3>Une passerelle vers l'emploi</h3>
+        <p>Des entreprises vérifiées, des offres détaillées, et des profils consultables avec l'accord de chacun.</p>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:32px; max-width:640px;">
+      <h3 style="font-size:15px; margin-bottom:8px;">Une précision honnête</h3>
+      <p style="color:var(--text-muted); font-size:13px; margin:0;">Ce site est actuellement un prototype de démonstration : les comptes, offres et profils affichés sont simulés et ne persistent pas au-delà de la session en cours. Il illustre l'expérience visée pour une future version connectée à de vraies données.</p>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="screen-quiz">
+    <div class="quiz-progress" id="quiz-progress"></div>
+    <div class="panel quiz-card" id="quiz-card"></div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="screen-results">
+    <div class="section-title">
+      <div>
+        <span class="eyebrow">Tes résultats</span>
+        <h2>Les secteurs qui te correspondent</h2>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('quiz')">Refaire le test</button>
+    </div>
+    <div class="grid" id="results-list" style="gap:18px;"></div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <!-- JOBS -->
+  <section class="screen" id="screen-jobs">
+    <div class="section-title">
+      <div>
+        <span class="eyebrow">Marché de l'emploi</span>
+        <h2>Offres correspondant à ton profil</h2>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="jobs-post-link" onclick="showScreen('business')" style="display:none;">Publier une offre →</button>
+    </div>
+    <div id="jobs-filters"></div>
+    <div class="grid" id="jobs-list" style="gap:14px;"></div>
+  </section>
+
+  <!-- BUSINESS -->
+  <section class="screen" id="screen-business">
+    <div class="section-title">
+      <div>
+        <span class="eyebrow">Espace entreprise</span>
+        <h2 id="business-title">Publier une offre d'emploi</h2>
+      </div>
+    </div>
+    <div id="business-body"></div>
+  </section>
+
+  <!-- CANDIDATS (entreprise) -->
+  <section class="screen" id="screen-candidats">
+    <div class="section-title">
+      <div>
+        <span class="eyebrow">Vivier de talents</span>
+        <h2>Profils et parcours des apprenants</h2>
+      </div>
+    </div>
+    <div class="explorer-filters" id="candidats-filters"></div>
+    <div class="grid" id="candidats-list" style="gap:14px;"></div>
+  </section>
+
+  <!-- PROFIL -->
+  <section class="screen" id="screen-profil">
+    <input type="file" id="profil-photo-input" accept="image/*" style="display:none;">
+    <div id="profil-body"></div>
+  </section>
+
+  <!-- EXPLORER -->
+  <section class="screen" id="screen-explorer">
+    <div class="section-title">
+      <div>
+        <span class="eyebrow">Tous les métiers</span>
+        <h2>Explorer les possibilités</h2>
+      </div>
+    </div>
+    <div class="explorer-filters" id="explorer-filters"></div>
+    <div id="explorer-list"></div>
+  </section>
+
+  <!-- ACADÉMIE -->
+  <section class="screen" id="screen-academie">
+    <div class="section-title">
+      <div>
+        <span class="eyebrow">Cours &amp; exercices</span>
+        <h2>Académie</h2>
+      </div>
+      <select id="academie-select" class="academie-select"></select>
+    </div>
+    <div id="academie-body"></div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo" style="cursor:default;">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 20 C4 12, 10 12, 12 4 C14 12, 20 12, 20 20" stroke="#E7B75F" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Voie
+      </div>
+      <p>Découvrir sa voie, se construire dans la durée, déboucher sur un emploi — un parcours accompagné du plus jeune âge à la vie active.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Apprenants</h4>
+      <button onclick="showScreen('quiz')">Test de découverte</button>
+      <button onclick="showScreen('explorer')">Explorer les métiers</button>
+      <button onclick="showScreen('academie')">Académie</button>
+      <button onclick="goToParcours()">Mon parcours</button>
+      <button onclick="showScreen('jobs')">Offres d'emploi</button>
+    </div>
+
+    <div class="footer-col">
+      <h4>Entreprises</h4>
+      <button onclick="showScreen('business')">Publier une offre</button>
+      <button onclick="showScreen('candidats')">Profils &amp; parcours</button>
+    </div>
+
+    <div class="footer-col">
+      <h4>À propos</h4>
+      <button onclick="showScreen('apropos')">Notre mission</button>
+      <button onclick="toast('Page à venir dans une future version.')">Mentions légales</button>
+      <button onclick="toast('Page à venir dans une future version.')">Confidentialité</button>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Voie — Prototype de démonstration, non affilié à une entreprise réelle.</span>
+  </div>
+</footer>
+
+<div class="fiche-modal" id="fiche-modal">
+  <div class="fiche-backdrop" onclick="closeFiche()"></div>
+  <div class="fiche-panel">
+    <button class="fiche-close" onclick="closeFiche()" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div id="fiche-body"></div>
+  </div>
+</div>
+
+<div class="fiche-modal" id="job-modal">
+  <div class="fiche-backdrop" onclick="closeJobDetail()"></div>
+  <div class="fiche-panel job-detail-panel">
+    <button class="fiche-close" onclick="closeJobDetail()" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div id="job-detail-body"></div>
+  </div>
+</div>
+
+<div class="fiche-modal" id="candidate-modal">
+  <div class="fiche-backdrop" onclick="closeCandidateDetail()"></div>
+  <div class="fiche-panel job-detail-panel">
+    <button class="fiche-close" onclick="closeCandidateDetail()" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div id="candidate-detail-body"></div>
+  </div>
+</div>
+
+<div class="confirm-overlay" id="confirm-modal">
+  <div class="confirm-backdrop" onclick="closeConfirm()"></div>
+  <div class="confirm-box">
+    <p id="confirm-text"></p>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeConfirm()">Annuler</button>
+      <button class="btn btn-gold btn-sm" id="confirm-yes-btn">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

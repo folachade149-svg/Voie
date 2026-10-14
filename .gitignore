@@ -1,0 +1,19 @@
+# Fichiers de test et artefacts temporaires
+__test.hta
+__resultats.txt
+resultats*.txt
+
+# Systèmes et éditeurs
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# Dépendances (si un build est ajouté plus tard)
+node_modules/
+
+# Fichiers de configuration locale
+*.local
+.env
