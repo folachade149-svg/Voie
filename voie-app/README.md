@@ -25,16 +25,23 @@ Compte de démonstration : `demo@voie.bj` / `demo1234`
 ```
 voie-app/
 ├── index.html          Structure et écrans (SPA par <section class="screen">)
+├── README.md           Documentation
+├── serve.ps1           Serveur statique local (remplace python -m http.server)
+├── _validate.ps1       Validation statique (identifiants, fonctions, échappement)
 ├── css/
-│   └── style.css       Thème sombre, variables CSS, responsive, accessibilité
+│   ├── style.css       Thème, grilles, header, responsive global
+│   └── academie.css    Mise en page plateforme de cours (sommaire, contenu, examen)
 └── js/
     ├── storage.js      Persistance localStorage, échappement XSS, empreinte des mots de passe
     ├── data.js         Données : secteurs, métiers, cours, quiz, offres d'emploi
-    └── app.js          Logique applicative et rendu
+    ├── app.js          Logique applicative, navigation, auth, offres, profil
+    ├── academie.js     Moteur de l'Académie (chargé après app.js)
+    └── _test.js        Test de fumée (à charger en dernier, hors production)
 ```
 
 **L'ordre de chargement des scripts est important** : `storage.js` définit `esc()`, `escAttr()`,
-`hashPwd()` et `VoieStore`, utilisés ensuite par `data.js` et `app.js`.
+`hashPwd()` et `VoieStore`, utilisés ensuite par `data.js` et `app.js`, puis `academie.js`
+qui redéfinit le rendu de l'Académie.
 
 ## Ce qui a été amélioré par rapport à `voie-prototype_14.html`
 
@@ -85,6 +92,41 @@ Bouton **« Réinitialiser mes données »** dans Profil → Compte pour reparti
 
 Le fichier unique de 3 386 lignes est découpé en HTML, CSS, JS et données.
 
+### 6. Académie : plateforme de cours
+
+- **Sommaire latéral** listant les 3 modules et leurs éléments (leçons, exercices,
+  examen), avec états verrouillé / en cours / validé — inspiré de W3Schools et
+  Cisco NetAcad.
+- **Navigation linéaire** leçon par leçon avec boutons Précédent / Suivant,
+  fil d'Ariane et barre de progression du module.
+- **Exercices** à correction immédiate (bonne réponse en vert, explication affichée),
+  façon freeCodeCamp.
+- **Examen noté** : mentions (très bien, bien, admis), correction détaillée question
+  par question, déblocage du module suivant à 70 %, tentatives illimitées.
+- **Modules 2 et 3 sans contenu** affichés honnêtement comme « programme prévu ».
+- Le quiz passe de 35 à 50 questions pour équilibrer les secteurs Mode, Aviation et
+  Éducation (minimum 6 items par secteur, contre 3 auparavant).
+
+### 7. Responsivité
+
+27 points de rupture répartis de 1000 px à 360 px :
+
+| Palier | Ajustements principaux |
+|---|---|
+| ≤ 1000 px | Header et onglets compactés |
+| ≤ 900 px | Académie : sommaire au-dessus du contenu |
+| ≤ 760 px | Padding général, profil, statistiques |
+| ≤ 640 px | Header en 2 lignes (logo + compte, puis onglets en bande défilante sans scroll visible), paddings et typographies mobiles, Académie compacte avec cibles tactiles agrandies |
+| ≤ 560 px | Footer en une colonne |
+| ≤ 480 px | Boutons du hero empilés sur toute la largeur |
+| ≤ 400 px | Sommaire Académie épuré, déconnexion du header remplacée par celle du Profil → Compte |
+| ≤ 360 px | Réduction finale (padding 12 px, titres) |
+
+Détails notables : le header utilise `display:contents` pour sortir ses enfants du
+conteneur, les grilles d'origine gardent leurs breakpoints, les libellés
+Précédent / Suivant de l'Académie sont tronqués en ellipsis, et
+`prefers-reduced-motion` reste respecté.
+
 ## Validation
 
 ```bash
@@ -95,9 +137,9 @@ Contrôle l'ordre des scripts, les identifiants, les fonctions appelées, les do
 l'équilibre des balises, le mot de passe de démonstration et l'échappement des valeurs
 dynamiques.
 
-`js/_test.js` contient un test de fumée à charger après `app.js` (échappement, empreinte
-des mots de passe, persistance, recherche, favoris, candidatures, modales, garde de
-connexion).
+`js/_test.js` contient un test de fumée à charger en dernier (échappement, empreinte
+des mots de passe, quiz, moteur Académie — navigation, exercices, examen en réussite
+et en échec, progression, persistance —, offres, modales, responsive).
 
 ## Limites connues
 

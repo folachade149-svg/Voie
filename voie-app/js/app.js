@@ -1228,6 +1228,14 @@ function renderProfil(){
       <div class="field"><label for="pc-email">Email</label><input id="pc-email" type="email" value="${escAttr(currentUser.email)}" required></div>
       <button type="submit" class="btn btn-gold btn-sm">Mettre à jour l'email</button>
     </form>
+    <hr style="border-color:var(--border); margin:24px 0;">
+    <div class="danger-zone">
+      <div>
+        <h4 style="font-size:14px; margin:0 0 4px;">Session</h4>
+        <p style="font-size:12px; color:var(--text-muted); margin:0;">Déconnecte-toi de cet appareil. Ta progression reste enregistrée ici.</p>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="logout()">Se déconnecter</button>
+    </div>
   `;
 
   const securitePane = `

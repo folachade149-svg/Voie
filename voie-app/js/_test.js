@@ -126,6 +126,21 @@ window.addEventListener('load', function(){
     document.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape' }));
     ok('Échap ferme la modale', !document.getElementById('job-modal').classList.contains('open'));
 
+    /* ===== Responsivité ===== */
+    var sheets = document.styleSheets;
+    var countMedia = 0;
+    for(var s2 = 0; s2 < sheets.length; s2++){
+      try{
+        var rules = sheets[s2].cssRules;
+        for(var q = 0; q < rules.length; q++){
+          if(rules[q].constructor.name === 'CSSMediaRule') countMedia++;
+        }
+      }catch(e){}
+    }
+    ok('feuilles de style chargées (' + sheets.length + ')', sheets.length >= 2);
+    ok('media queries présentes (' + countMedia + ')', countMedia >= 20);
+    ok('viewport mobile présent', !!document.querySelector('meta[name="viewport"]'));
+
     VoieStore.clear();
   }catch(err){
     r.push('EXCEPTION ' + (err && err.message));

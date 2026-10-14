@@ -134,6 +134,42 @@
   nav.tabs button:hover{ color:var(--text); background:rgba(244,241,234,0.06); }
   nav.tabs button.active{ color:var(--bg); background:var(--gold); font-weight:600; }
 
+  /* ---------- Header : tablette ---------- */
+  @media (max-width:1000px){
+    header.nav{ padding:12px 18px; }
+    nav.tabs button{ padding:7px 11px; font-size:13.5px; }
+    .nav-right{ gap:10px; }
+  }
+
+  /* ---------- Header : mobile (logo + compte en haut, onglets en bande défilante) ---------- */
+  @media (max-width:640px){
+    header.nav{ padding:10px 14px; flex-wrap:wrap; row-gap:8px; }
+    .nav-right{ display:contents; }          /* les enfants passent dans le flex du header */
+    .logo{ order:1; font-size:20px; gap:8px; }
+    .logo svg{ width:22px; height:22px; }
+    .header-account{ order:2; margin-left:auto; }
+    .header-avatar-btn{ padding:3px 10px 3px 3px; font-size:12.5px; }
+    .header-avatar-btn .avatar-init{ width:26px; height:26px; }
+    .header-avatar-btn .avatar-init-lg{ width:26px; height:26px; }
+    .header-avatar-btn img{ width:26px; height:26px; }
+    .header-logout-btn{ font-size:11.5px; }
+    nav.tabs{
+      order:3; width:100%; flex-wrap:nowrap;
+      overflow-x:auto; overflow-y:hidden;
+      -webkit-overflow-scrolling:touch; scrollbar-width:none;
+      padding-bottom:2px;
+    }
+    nav.tabs::-webkit-scrollbar{ display:none; }
+    nav.tabs button{
+      flex:0 0 auto; white-space:nowrap;
+      padding:7px 12px; font-size:13.5px;
+    }
+  }
+  @media (max-width:400px){
+    .header-logout-btn{ display:none; }       /* déconnexion accessible via le Profil */
+    nav.tabs button{ padding:7px 10px; font-size:13px; }
+  }
+
   main{ position:relative; z-index:1; max-width:980px; margin:0 auto; padding:48px 24px 96px; }
 
   /* ---------- Footer ---------- */
@@ -642,4 +678,90 @@
   .confirm-backdrop{ position:absolute; inset:0; background:rgba(6,10,22,0.75); }
   .confirm-box{ position:relative; background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius); padding:28px; max-width:380px; text-align:center; animation:fadein .2s ease; }
   .confirm-box p{ color:var(--text-muted); font-size:14px; margin:0 0 22px; }
+
+  /* ============================================================================================
+     RESPONSIVE GLOBAL — paliers secondaires
+     Le header a ses propres règles (plus haut). Les grilles principales ont déjà leurs
+     breakpoints. Ici : paddings, tailles de texte et détails qui cassaient sur petit écran.
+     ============================================================================================ */
+
+  @media (max-width:760px){
+    main{ padding:32px 20px 72px; }
+    .profile-hero{ padding:24px 20px; gap:18px; }
+    .avatar-wrap, .avatar-wrap img, .avatar-wrap .avatar-init-lg{ width:78px; height:78px; }
+    .avatar-init-lg{ font-size:28px; }
+    .hero-stats{ gap:20px; }
+    .hero-stat .num{ font-size:21px; }
+  }
+
+  @media (max-width:640px){
+    main{ padding:26px 16px 64px; }
+    .footer-inner{ padding:36px 16px 26px; gap:24px; }
+    .footer-bottom{ padding:16px; font-size:11.5px; }
+
+    /* Titres */
+    .hero h1{ font-size:30px; }
+    .section-title h2{ font-size:21px; }
+    .eyebrow{ font-size:11px; letter-spacing:0.1em; }
+    .lede{ font-size:15px; }
+
+    /* Quiz */
+    .quiz-card{ padding:34px 18px; }
+    .quiz-card h2{ font-size:21px; }
+    .quiz-choices{ margin-top:26px; gap:10px; }
+    .quiz-choices button{ min-width:0; flex:1 1 45%; padding:14px 14px; font-size:13.5px; }
+    .quiz-choices.choice-mode button{ flex:1 1 auto; }
+    .quiz-progress{ margin-bottom:20px; }
+
+    /* Panneaux et formulaires */
+    .login-panel{ padding:24px 18px; }
+    .panel{ padding:20px 16px; }
+    .why .grid-3 .panel{ padding:18px 16px; }
+    .compare-col{ padding:20px 18px; }
+    .final-cta{ padding:30px 18px; }
+
+    /* Statistiques : le libellé réduit pour laisser de la place aux barres */
+    .stat-label{ width:112px; font-size:12.5px; }
+    .stats-row{ gap:20px; padding:20px 0; }
+    .stat-block{ min-width:84px; }
+    .stat-block .num{ font-size:21px; }
+
+    /* Exercices / filtres déjà gérés côté academie.css */
+    .explorer-filters{ margin-bottom:16px; }
+    .explorer-filters button{ padding:7px 12px; font-size:12.5px; }
+    .metier-chip{ font-size:12.5px; padding:5px 10px; }
+
+    /* Modales latérales : bande de défilement évitée */
+    .fiche-panel{ padding:58px 16px 24px; }
+    .confirm-box{ padding:22px 18px; }
+  }
+
+  @media (max-width:560px){
+    .footer-inner{ grid-template-columns:1fr; gap:26px; }
+    .footer-col{ gap:9px; }
+  }
+
+  @media (max-width:480px){
+    .hero h1{ font-size:26px; }
+    .hero-actions{ flex-direction:column; gap:10px; }
+    .hero-actions .btn{ width:100%; justify-content:center; }
+    .domain-grid{ gap:10px; }
+    .stat-label{ width:96px; font-size:12px; }
+    .quiz-choices button{ flex:1 1 100%; }
+    .role-card{ padding:20px 18px; }
+    .role-card h3{ font-size:17px; }
+    .section-title{ margin-bottom:14px; }
+    .ac-content, .ac-pager{ margin-bottom:12px; }
+  }
+
+  @media (max-width:360px){
+    main{ padding:22px 12px 56px; }
+    .hero h1{ font-size:23px; }
+    .section-title h2{ font-size:19px; }
+    .logo{ font-size:19px; }
+    .btn{ padding:11px 16px; font-size:14px; }
+    .stat-label{ width:84px; }
+    .stat-track{ height:7px; }
+  }
+
   .confirm-actions{ display:flex; gap:10px; justify-content:center; }
