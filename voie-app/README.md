@@ -6,11 +6,17 @@ dans un navigateur (aucun serveur, aucune dépendance, aucun `npm install`).
 
 ## Démarrer
 
-Double-clique sur `index.html`, ou sers le dossier :
+Python n'est pas installé sur cette machine : utilise le serveur PowerShell fourni.
 
-```bash
-python -m http.server 8000     # puis http://localhost:8000
+```powershell
+cd voie-app
+powershell -NoProfile -ExecutionPolicy Bypass -File serve.ps1          # port 8000
+powershell -NoProfile -ExecutionPolicy Bypass -File serve.ps1 -Port 8080
 ```
+
+Puis ouvre http://localhost:8000/ dans le navigateur. `Ctrl+C` pour arrêter.
+Un simple double-clic sur `index.html` fonctionne aussi, mais le serveur garantit
+le bon type MIME et évite les restrictions de `file://`.
 
 Compte de démonstration : `demo@voie.bj` / `demo1234`
 
